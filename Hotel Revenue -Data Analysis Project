@@ -1,0 +1,81 @@
+--Fetching Data From Tables
+
+select * from dbo.['2018']
+select * from dbo.['2019']
+select * from dbo.['2020']
+
+--Combining The Data
+
+select * from dbo.['2018']
+union
+select * from dbo.['2019']
+union
+select * from dbo.['2020']
+
+--Exploratory Data Analysis (EDA)
+
+--Is our hotel revenue growing yearly?
+--Should we increase our parking lot size?
+--What trends can we see in the data?
+
+--Creating a Temp Table to combine all tables for easier analysis
+select 
+
+  with hotels as(
+select * from dbo.['2018']
+union
+select * from dbo.['2019']
+union
+select * from dbo.['2020'])
+
+select * from hotels
+
+--Is our hotel revenue growing yearly?
+--Create a new column revenue
+
+select 
+  (stays_in_week_nights + stays_in_weekend_nights) * adr
+  as revenue from hotels
+
+--Calculate the Sum of Revenue while grouping the data by year
+
+select 
+arrival_date_year
+sum((stays_in_week_nights + stays_in_weekend_nights) * adr)
+as revenue from hotels group by arrival_date_year
+
+--Determine the revenue trend by hotel type by grouping the data by hotel and then seeing which hotels have generated the most revenue
+
+select 
+arrival_date_year, hotel,
+sum((stays_in_week_nights + stays_in_weekend_nights) * adr)
+as revenue from hotels group by arrival_date_year, hotel
+
+--Should we increase our parking lot size?
+
+select
+arrival_date_year, hotel,
+sum((stays_in_week_nights + stays_in_weekend _nights) * adr) as renenue,
+concat (round((sum(required_car_parking_spaces)/sum(stays_in_week_nights +
+stays_in_weekend_nights)) * 100, 2), '%') as parking_percentage
+from hotels group by arrival_date_year, hotel
+
+--SQL Query to be used for Data Visualizations Using Power BI
+
+with hotels as(
+select * from dbo.['2018']
+union
+select * from dbo.['2019']
+union
+select * from dbo.['2020'])
+
+select * from hotels
+left join dbo.market_segment$
+on hotels.market_segment = market_segment$.market_segment
+left join dbo.meal_cost
+on meal_cost.meal = hotels.meal
+
+
+
+
+
